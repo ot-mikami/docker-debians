@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  cakephp-composer-vendor:
+
 services:
   debian-nodenv:
     build:
@@ -7,6 +10,7 @@ services:
       args:
         ANYENV_DIR: '/.anyenv'
     tty: true
+
   debian-nvm:
     build:
       context: ./dockerfiles/debian-nvm
@@ -14,3 +18,27 @@ services:
         NVM_DIR: '/.nvm'
         NODE_VERSION: 'lts/*'
     tty: true
+
+  debian-cakephp:
+    build:
+      context: ./dockerfiles/debian-cakephp
+      args:
+        TZ: Asia/Tokyo
+        PHP7_VERSION: 7.4
+        COMPOSER_VERSION: latest
+    env_file: ./.env
+    # links:
+    #   - mysqls
+    volumes:
+      - ./services/cakephp/log/apache2:/var/log/apache2
+      - ./src:${WORKING_DIR:-/src}
+      - ./services/cakephp/config/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./services/cakephp/config/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+      - ./services/cakephp/config/cakephp.local.env:${CAKE_PROJECT_DIR:-/src}/config/.env
+      - ./services/cakephp/log/cakephp:${CAKE_PROJECT_DIR:-/src}/logs
+      - cakephp-composer-vendor:${CAKE_PROJECT_DIR:-/src}/vendor
+    working_dir: ${WORKING_DIR:-/src}
+    ports:
+      - "${CAKE_HOST_IP:-127.0.0.1}:${CAKE_HOST_WEB_PORT:-80}:80"
+      - "${CAKE_HOST_IP:-127.0.0.1}:${CAKE_HOST_WEB_SSL_PORT:-443}:443"
+      - "${CAKE_HOST_IP:-127.0.0.1}:${CAKE_HOST_CAKE_PORT:-8765}:8765"
