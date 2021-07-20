@@ -1,6 +1,12 @@
 version: '3'
 
 services:
+  debian-nodenv:
+    build:
+      context: ./dockerfiles/debian-nodenv
+      args:
+        ANYENV_DIR: '/.anyenv'
+    tty: true
   debian-nvm:
     build:
       context: ./dockerfiles/debian-nvm
