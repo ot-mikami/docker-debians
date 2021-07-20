@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  debian-nvm:
+    build:
+      context: ./dockerfiles/debian-nvm
+      args:
+        NVM_DIR: '/.nvm'
+        NODE_VERSION: 'lts/*'
+    tty: true
