@@ -7,3 +7,10 @@ services:
       args:
         ANYENV_DIR: '/.anyenv'
     tty: true
+  debian-nvm:
+    build:
+      context: ./dockerfiles/debian-nvm
+      args:
+        NVM_DIR: '/.nvm'
+        NODE_VERSION: 'lts/*'
+    tty: true
